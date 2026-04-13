@@ -75,7 +75,7 @@ echo "Launching LibreOffice Impress..."
 su - ga -c "DISPLAY=:1 libreoffice --impress /home/ga/Documents/Presentations/strategic_initiatives.odp > /tmp/impress_task.log 2>&1 &"
 
 # 5. Wait for application to be ready
-wait_for_window "LibreOffice Impress" 60 || echo "WARNING: Window wait timeout"
+wait_for_window "LibreOffice Impress" 120 || echo "WARNING: Window wait timeout"
 
 # 6. Ensure window is focused and maximized
 wid=$(get_impress_window_id)

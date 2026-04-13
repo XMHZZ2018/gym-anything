@@ -871,7 +871,7 @@ class DockerRunner(BaseRunner):
         self.exec(f"bash -lc 'python3 /workspace/env_api.py {shlex.quote(name)} {argv}'")
 
     # Public utility for recorders
-    def exec(self, cmd: str, env: Optional[Dict[str, str]] = None, user: Optional[str] = None, use_pty: bool = True) -> int:
+    def exec(self, cmd: str, env: Optional[Dict[str, str]] = None, user: Optional[str] = None, use_pty: bool = True, timeout: Optional[int] = None) -> int:
         # Note: use_pty is accepted for API compatibility with QemuApptainerRunner but is
         # ignored here. Docker exec doesn't have the same PTY/SIGHUP behavior as SSH.
         env = self.merge_exec_env(env)
@@ -881,7 +881,7 @@ class DockerRunner(BaseRunner):
                 full_cmd += ["-e", f"{k}={v}"]
         if user:
             full_cmd += ["-u", user]
-        full_cmd += [self.container_name, "bash", "-lc", cmd]
+        full_cmd += [self.container_name, "bash", "-c", cmd]
 
         sh_output = _sh(full_cmd, check=True)
         return sh_output
@@ -894,7 +894,7 @@ class DockerRunner(BaseRunner):
                 full_cmd += ["-e", f"{k}={v}"]
         if user:
             full_cmd += ["-u", user]
-        full_cmd += [self.container_name, "bash", "-lc", cmd]
+        full_cmd += [self.container_name, "bash", "-c", cmd]
         return subprocess.Popen(full_cmd, stdout=stdout, stderr=stderr)
 
     def to_container_path(self, host_path):
@@ -918,7 +918,7 @@ class DockerRunner(BaseRunner):
         full_cmd = ["docker", "exec"]
         for k, v in self.default_exec_env().items():
             full_cmd += ["-e", f"{k}={v}"]
-        full_cmd += [self.container_name, "bash", "-lc", cmd]
+        full_cmd += [self.container_name, "bash", "-c", cmd]
         proc = subprocess.run(full_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         return proc.stdout
 
@@ -926,7 +926,7 @@ class DockerRunner(BaseRunner):
         full_cmd = ["docker", "exec"]
         for k, v in self.default_exec_env().items():
             full_cmd += ["-e", f"{k}={v}"]
-        full_cmd += [self.container_name, "bash", "-lc", cmd]
+        full_cmd += [self.container_name, "bash", "-c", cmd]
         proc = subprocess.run(full_cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         return proc.stdout
 

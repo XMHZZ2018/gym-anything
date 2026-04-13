@@ -99,7 +99,7 @@ su - ga -c "DISPLAY=:1 libreoffice --impress /home/ga/Documents/Presentations/es
 wait_for_process "soffice" 20
 if ! wait_for_window "esg_report" 60; then
     echo "WARNING: Window 'esg_report' not found, checking generic..."
-    wait_for_window "LibreOffice Impress" 10
+    wait_for_window "LibreOffice Impress" 120
 fi
 
 # Maximize and focus

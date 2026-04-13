@@ -97,7 +97,7 @@ else
 fi
 
 # Wait for window
-wait_for_window "LibreOffice Impress" 60
+wait_for_window "LibreOffice Impress" 120
 
 # Maximize window
 WID=$(get_impress_window_id)

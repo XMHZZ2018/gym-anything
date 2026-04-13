@@ -58,7 +58,7 @@ echo "Launching LibreOffice Impress..."
 su - ga -c "DISPLAY=:1 libreoffice --impress $PRES_DIR/culture_deck.odp > /tmp/impress.log 2>&1 &"
 
 # 6. Wait for window and maximize
-wait_for_window "LibreOffice Impress" 60
+wait_for_window "LibreOffice Impress" 120
 WID=$(get_impress_window_id)
 
 if [ -n "$WID" ]; then

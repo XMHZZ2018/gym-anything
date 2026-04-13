@@ -67,7 +67,7 @@ su - ga -c "DISPLAY=:1 libreoffice --impress $PRES_DIR/orientation_kiosk.odp > /
 
 # Wait for process and window
 wait_for_process "soffice" 15
-wait_for_window "LibreOffice Impress" 60
+wait_for_window "LibreOffice Impress" 120
 
 # Maximize and focus
 wid=$(get_impress_window_id)

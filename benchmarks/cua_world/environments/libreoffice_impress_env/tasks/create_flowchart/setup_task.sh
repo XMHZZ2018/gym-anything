@@ -32,7 +32,7 @@ if ! wait_for_process "soffice" 30; then
 fi
 
 # Wait for window to appear
-if ! wait_for_window "Impress\|impress\|flowchart_test\|\.odp" 90; then
+if ! wait_for_window "LibreOffice Impress" 120; then
     echo "WARNING: LibreOffice Impress window did not appear in time"
 fi
 sleep 3

@@ -53,7 +53,7 @@ echo "Launching LibreOffice Impress..."
 su - ga -c "DISPLAY=:1 libreoffice --impress &"
 
 # Wait for Impress
-if wait_for_window "LibreOffice Impress" 30; then
+if wait_for_window "LibreOffice Impress" 120; then
     echo "Impress started successfully"
     # Dismiss "Select a Template" dialog if it appears (Esc usually works)
     safe_xdotool ga :1 key Escape 2>/dev/null || true

@@ -65,7 +65,7 @@ if ! pgrep -f "soffice.bin" > /dev/null; then
     su - ga -c "DISPLAY=:1 libreoffice --impress /home/ga/Documents/Presentations/thesis_draft.odp > /tmp/impress.log 2>&1 &"
     
     # Wait for window
-    wait_for_window "LibreOffice Impress" 30 || echo "Warning: Window wait timeout"
+    wait_for_window "LibreOffice Impress" 120 || echo "Warning: Window wait timeout"
 fi
 
 # Focus and maximize

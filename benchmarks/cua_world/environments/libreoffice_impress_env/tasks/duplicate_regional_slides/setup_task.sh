@@ -87,7 +87,7 @@ echo "Launching LibreOffice Impress..."
 su - ga -c "DISPLAY=:1 libreoffice --impress '$ODP_PATH' > /tmp/impress.log 2>&1 &"
 
 # Wait for window
-wait_for_window "LibreOffice Impress" 30
+wait_for_window "LibreOffice Impress" 120
 
 # Maximize window
 DISPLAY=:1 wmctrl -r "LibreOffice Impress" -b add,maximized_vert,maximized_horz 2>/dev/null || true

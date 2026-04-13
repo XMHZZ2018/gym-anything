@@ -51,7 +51,7 @@ su - ga -c "DISPLAY=:1 libreoffice --impress /home/ga/Documents/Presentations/pi
 
 # Wait for process and window
 wait_for_process "soffice" 15
-wait_for_window "LibreOffice Impress" 60
+wait_for_window "LibreOffice Impress" 120
 
 # Maximize window
 wid=$(get_impress_window_id)

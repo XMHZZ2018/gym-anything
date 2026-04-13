@@ -113,7 +113,7 @@ su - ga -c "DISPLAY=:1 libreoffice --impress '$ODP_FILE' > /tmp/impress_task.log
 wait_for_process "soffice" 15
 
 # Wait for window
-wait_for_window "LibreOffice Impress" 60
+wait_for_window "LibreOffice Impress" 120
 
 # Focus window
 wid=$(get_impress_window_id)

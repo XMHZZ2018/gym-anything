@@ -99,7 +99,7 @@ echo "Launching LibreOffice Impress..."
 su - ga -c "DISPLAY=:1 libreoffice --impress $TARGET_FILE > /dev/null 2>&1 &"
 
 # Wait for window
-wait_for_window "classical_mechanics" 60 || wait_for_window "Impress" 60
+wait_for_window "classical_mechanics" 60 || wait_for_window "LibreOffice Impress" 120
 
 # Maximize and focus
 wid=$(get_impress_window_id)

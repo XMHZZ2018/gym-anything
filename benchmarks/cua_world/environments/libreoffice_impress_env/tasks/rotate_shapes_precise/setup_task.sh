@@ -144,7 +144,7 @@ echo "Launching LibreOffice Impress..."
 su - ga -c "DISPLAY=:1 libreoffice --impress /home/ga/Documents/Presentations/design_review.odp > /tmp/impress.log 2>&1 &"
 
 # Wait for window
-wait_for_window "LibreOffice Impress" 60
+wait_for_window "LibreOffice Impress" 120
 wait_for_window "design_review" 30 || true
 
 # Maximize and focus

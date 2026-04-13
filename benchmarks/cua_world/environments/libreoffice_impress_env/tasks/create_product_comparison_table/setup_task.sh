@@ -20,7 +20,7 @@ if ! pgrep -f "soffice.bin" > /dev/null; then
     su - ga -c "DISPLAY=:1 libreoffice --impress &"
     
     # Wait for window
-    wait_for_window "LibreOffice Impress" 30
+    wait_for_window "LibreOffice Impress" 120
 else
     echo "LibreOffice is already running."
 fi

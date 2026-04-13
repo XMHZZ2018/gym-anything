@@ -93,7 +93,7 @@ su - ga -c "DISPLAY=:1 libreoffice --impress '$TARGET_FILE' > /tmp/impress_arch.
 
 # Wait for process and window
 wait_for_process "soffice" 20
-wait_for_window "LibreOffice Impress" 60
+wait_for_window "LibreOffice Impress" 120
 
 # Maximize window
 sleep 3
