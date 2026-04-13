@@ -2,7 +2,7 @@
   "id": "create_flowchart@1",
   "version": "1.0",
   "env_id": "libreoffice_impress_env@0.1",
-  "description": "Create a flowchart diagram representing a process.",
+  "description": "Create a flowchart diagram representing a process. Save the presentation to /home/ga/Documents/Presentations/flowchart_test.odp.",
   "difficulty": "medium",
   "init": {
     "timeout_sec": 240,

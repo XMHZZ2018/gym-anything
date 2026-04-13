@@ -2,7 +2,7 @@
   "id": "bulk_text_replace@1",
   "version": "1.0",
   "env_id": "libreoffice_impress_env@0.1",
-  "description": "In the WHO Health Workforce Report presentation, replace all instances of the word 'workforce' with 'personnel' across all slides using Find & Replace (Ctrl+H). Save the file after replacement.",
+  "description": "In the WHO Health Workforce Report presentation, replace all instances of the word 'workforce' with 'personnel' across all slides using Find & Replace (Ctrl+H). Save the file to /home/ga/Documents/Presentations/replace_test.odp after replacement.",
   "difficulty": "medium-hard",
   "init": {
     "timeout_sec": 120,
