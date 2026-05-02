@@ -34,3 +34,6 @@ venv/
 
 scratch
 examples_new
+*.snap
+*.appimage
+*.tar.gz

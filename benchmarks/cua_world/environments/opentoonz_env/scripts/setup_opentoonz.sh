@@ -37,7 +37,7 @@ cat > /home/ga/Desktop/OpenToonz.desktop << 'EOF'
 [Desktop Entry]
 Name=OpenToonz
 Comment=2D Animation Software
-Exec=/snap/bin/opentoonz
+Exec=/usr/local/bin/opentoonz
 Icon=opentoonz
 StartupNotify=true
 Terminal=false
@@ -53,10 +53,7 @@ cat > /usr/local/bin/launch-opentoonz << 'LAUNCH_EOF'
 export DISPLAY=${DISPLAY:-:1}
 xhost +local: 2>/dev/null || true
 
-# Try snap version first, then system version
-if [ -x /snap/bin/opentoonz ]; then
-    exec /snap/bin/opentoonz "$@"
-elif command -v opentoonz &> /dev/null; then
+if command -v opentoonz &> /dev/null; then
     exec opentoonz "$@"
 else
     echo "OpenToonz not found"
@@ -65,9 +62,16 @@ fi
 LAUNCH_EOF
 chmod +x /usr/local/bin/launch-opentoonz
 
-# Disable first-run wizard if possible by creating config
-# OpenToonz stores preferences in ~/.config/OpenToonz/
-su - ga -c "mkdir -p /home/ga/.config/OpenToonz/stuff/config"
+# Seed the user's config from the AppImage's bundled `stuff/` tree. The
+# bundled launcher only copies this on first run if ~/.config/OpenToonz/stuff
+# does NOT exist yet — and OpenToonz needs the menubar/template files inside
+# or it shows a permanent "Cannot open menubar settings template file"
+# warning dialog blocking the main UI.
+su - ga -c "mkdir -p /home/ga/.config/OpenToonz"
+BUNDLED_STUFF=/opt/opentoonz/share/opentoonz/stuff
+if [ -d "$BUNDLED_STUFF" ]; then
+    cp -r "$BUNDLED_STUFF" /home/ga/.config/OpenToonz/
+fi
 
 # Create a preferences file to skip startup dialogs
 cat > /home/ga/.config/OpenToonz/stuff/config/preferences.ini << 'PREF_EOF'
@@ -94,11 +98,22 @@ su - ga -c "DISPLAY=:1 /usr/local/bin/launch-opentoonz > /tmp/opentoonz.log 2>&1
 echo "Waiting for OpenToonz to load..."
 sleep 20
 
-# Wait for main window to appear (poll for up to 60 seconds)
+# Wait for main window to appear (poll for up to 60 seconds). The startup
+# splash, "- Warning", "- Information" and "Startup" dialogs all also have
+# OpenToonz-prefixed titles, so explicitly exclude those and require a
+# title that does NOT match any dialog form.
 TIMEOUT=60
 ELAPSED=0
+is_main_window_open() {
+    DISPLAY=:1 wmctrl -l 2>/dev/null \
+      | awk '{ $1=$2=$3=""; sub(/^   /,""); print }' \
+      | grep -E "^OpenToonz [0-9]" \
+      | grep -vE " - (Warning|Information|Error)$" \
+      | grep -vE "^OpenToonz [0-9.]+ - Startup$" \
+      | grep -q .
+}
 while [ $ELAPSED -lt $TIMEOUT ]; do
-    if DISPLAY=:1 wmctrl -l 2>/dev/null | grep -q "OpenToonz 1.5"; then
+    if is_main_window_open; then
         echo "OpenToonz main window detected after ${ELAPSED}s"
         break
     fi
@@ -109,25 +124,38 @@ done
 # Additional wait for dialogs to appear
 sleep 5
 
-# Dismiss startup dialogs
+# Dismiss startup dialogs. The editor opens with stacked dialogs over the
+# main window: an "OpenToonz 1.4 - Information" update notice (which fires
+# from an async update check that can pop up many seconds AFTER the main
+# window appears) and an "OpenToonz Startup" project picker. Send the
+# keypress directly to each window by id (wmctrl -a + global xdotool key
+# was unreliable when modal grabs were active). Poll for ~30s so we catch
+# late-appearing dialogs.
 echo "Dismissing startup dialogs..."
 
-# Close the Information dialog first (press Enter or click OK)
-for i in 1 2 3; do
-    DISPLAY=:1 wmctrl -a "Information" 2>/dev/null && sleep 0.5 && DISPLAY=:1 xdotool key Return 2>/dev/null || true
-    sleep 1
-done
+dismiss_one() {
+    local title_pattern="$1"
+    local key="$2"
+    local win_ids
+    win_ids=$(DISPLAY=:1 xdotool search --name "$title_pattern" 2>/dev/null || true)
+    [ -z "$win_ids" ] && return 0
+    for wid in $win_ids; do
+        DISPLAY=:1 xdotool windowactivate --sync "$wid" 2>/dev/null || true
+        DISPLAY=:1 xdotool key --window "$wid" "$key" 2>/dev/null || true
+        DISPLAY=:1 wmctrl -i -c "$wid" 2>/dev/null || true
+    done
+}
 
-# Close the Startup dialog (press Escape or click the X)
-for i in 1 2 3; do
-    DISPLAY=:1 wmctrl -a "Startup" 2>/dev/null && sleep 0.5 && DISPLAY=:1 xdotool key Escape 2>/dev/null || true
+DISMISS_DEADLINE=$(( $(date +%s) + 60 ))
+while [ "$(date +%s)" -lt "$DISMISS_DEADLINE" ]; do
+    dismiss_one "OpenToonz [0-9.]+ - Information" Return
+    dismiss_one "OpenToonz Startup" Escape
+    dismiss_one "OpenToonz [0-9.]+ - (Warning|Error)" Return
+    LEFT=$(DISPLAY=:1 wmctrl -l 2>/dev/null \
+      | awk '{ $1=$2=$3=""; sub(/^   /,""); print }' \
+      | grep -E "(OpenToonz [0-9.]+ - (Warning|Information|Error)|OpenToonz Startup)" || true)
+    [ -z "$LEFT" ] && break
     sleep 1
-done
-
-# Try pressing Escape a few more times to dismiss any remaining dialogs
-for i in 1 2 3; do
-    DISPLAY=:1 xdotool key Escape 2>/dev/null || true
-    sleep 0.5
 done
 
 # Click somewhere in the middle of the screen to dismiss any popups
@@ -138,13 +166,42 @@ sleep 1
 pkill -f firefox 2>/dev/null || true
 sleep 2
 
-# Maximize the main OpenToonz window
-DISPLAY=:1 wmctrl -r "OpenToonz 1.5" -b add,maximized_vert,maximized_horz 2>/dev/null || true
-DISPLAY=:1 wmctrl -a "OpenToonz 1.5" 2>/dev/null || true
+# Locate the main OpenToonz editor window (not splash/warning/dialog) and
+# maximize it.
+MAIN_WIN_LINE=$(DISPLAY=:1 wmctrl -l 2>/dev/null \
+  | awk '{ id=$1; $1=$2=$3=""; sub(/^   /,""); printf "%s\t%s\n", id, $0 }' \
+  | grep -E $'\t'"OpenToonz [0-9]" \
+  | grep -vE " - (Warning|Information|Error)$" \
+  | grep -vE " - Startup$" \
+  | head -n 1)
+if [ -n "$MAIN_WIN_LINE" ]; then
+    MAIN_WIN_ID=$(printf '%s' "$MAIN_WIN_LINE" | cut -f1)
+    DISPLAY=:1 wmctrl -i -r "$MAIN_WIN_ID" -b add,maximized_vert,maximized_horz 2>/dev/null || true
+    DISPLAY=:1 wmctrl -i -a "$MAIN_WIN_ID" 2>/dev/null || true
+fi
 
 # Final check
 echo "Windows after setup:"
 DISPLAY=:1 wmctrl -l 2>/dev/null || true
+
+# Fail loudly if the main editor window never appeared — verify_setup uses
+# the exit status of this hook to decide PASS/FAIL, so do not let a stuck
+# splash or unhandled warning dialog look like success.
+if [ -z "$MAIN_WIN_LINE" ]; then
+    echo "ERROR: OpenToonz main editor window did not open after setup" >&2
+    exit 1
+fi
+
+# Also fail if any startup/error dialog survived dismissal — they would block
+# the main UI from receiving input.
+LEFTOVER_DIALOGS=$(DISPLAY=:1 wmctrl -l 2>/dev/null \
+  | awk '{ $1=$2=$3=""; sub(/^   /,""); print }' \
+  | grep -E "(OpenToonz [0-9.]+ - (Warning|Information|Error)|OpenToonz Startup)" || true)
+if [ -n "$LEFTOVER_DIALOGS" ]; then
+    echo "ERROR: dismiss left blocking dialogs:" >&2
+    echo "$LEFTOVER_DIALOGS" >&2
+    exit 1
+fi
 
 echo "=== OpenToonz setup complete ==="
 echo "OpenToonz is ready!"
