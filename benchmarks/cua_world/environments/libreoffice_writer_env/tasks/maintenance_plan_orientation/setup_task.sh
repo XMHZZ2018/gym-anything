@@ -145,7 +145,7 @@ echo "Starting LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/maintenance_plan_draft.docx > /tmp/writer.log 2>&1 &"
 
 # Wait for window
-wait_for_window "LibreOffice Writer" 30 || wait_for_window "maintenance_plan" 30
+ensure_writer_loaded || true
 
 # Maximize window
 WID=$(get_writer_window_id)
@@ -156,5 +156,10 @@ fi
 
 # Initial screenshot
 take_screenshot /tmp/task_initial.png
+
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true
 
 echo "=== Setup complete ==="

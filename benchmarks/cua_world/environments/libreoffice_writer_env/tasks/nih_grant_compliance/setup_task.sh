@@ -247,3 +247,7 @@ echo "Source document: /home/ga/Documents/r01_draft.docx"
 echo "Required output: /home/ga/Documents/r01_formatted.docx"
 echo "Compliance requirements: NIH PA-23-093 (Arial/Helvetica/Georgia/Palatino 11pt+, 0.5in margins, Heading 1 for 6 sections, hanging indent for references, header with grant info)"
 exit 0
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true

@@ -159,7 +159,7 @@ if ! pgrep -f "soffice.bin" > /dev/null; then
 fi
 
 # Wait for window
-wait_for_window "LibreOffice Writer" 60 || wait_for_window "esa_draft" 60
+ensure_writer_loaded || true
 
 # Maximize and focus
 WID=$(get_writer_window_id)
@@ -178,5 +178,10 @@ sleep 1
 # Take initial screenshot
 echo "Capturing initial state..."
 DISPLAY=:1 scrot /tmp/task_initial.png 2>/dev/null || true
+
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true
 
 echo "=== Task setup complete ==="

@@ -76,7 +76,7 @@ echo "Launching LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/council_minutes_raw.odt > /tmp/writer.log 2>&1 &"
 
 # Wait for window
-wait_for_window "LibreOffice Writer" 60 || wait_for_window "council_minutes_raw" 60
+ensure_writer_loaded || true
 
 # Maximize window
 WID=$(get_writer_window_id)
@@ -93,5 +93,10 @@ safe_xdotool ga :1 key Escape
 
 # Take initial screenshot
 DISPLAY=:1 scrot /tmp/task_initial.png 2>/dev/null || true
+
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true
 
 echo "=== Task setup complete ==="

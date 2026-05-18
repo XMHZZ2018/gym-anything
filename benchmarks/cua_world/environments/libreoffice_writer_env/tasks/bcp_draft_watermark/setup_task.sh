@@ -145,7 +145,7 @@ su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/bcp_p
 wait_for_process "soffice" 20
 
 # Wait for window
-wait_for_window "LibreOffice Writer" 60 || wait_for_window "bcp_plan" 30
+ensure_writer_loaded || true
 
 # Maximize and focus
 WID=$(get_writer_window_id)
@@ -164,5 +164,10 @@ fi
 echo "Capturing initial state..."
 sleep 2
 DISPLAY=:1 scrot /tmp/task_initial.png 2>/dev/null || true
+
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true
 
 echo "=== Setup complete ==="

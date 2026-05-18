@@ -83,7 +83,7 @@ if ! pgrep -f "libreoffice" > /dev/null; then
 fi
 
 # Wait for window
-wait_for_window "LibreOffice Writer" 60
+ensure_writer_loaded || true
 
 # Maximize and Focus
 WID=$(get_writer_window_id)

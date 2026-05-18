@@ -140,7 +140,7 @@ if ! wait_for_process "soffice" 20; then
 fi
 
 # Wait for window
-wait_for_window "git_guide_draft" 30 || wait_for_window "LibreOffice Writer" 30
+ensure_writer_loaded || true
 
 # Maximize and focus
 wid=$(get_writer_window_id)

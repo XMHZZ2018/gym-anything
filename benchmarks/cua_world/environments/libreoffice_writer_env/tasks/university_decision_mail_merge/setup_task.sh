@@ -74,7 +74,7 @@ echo "Starting LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore > /tmp/writer.log 2>&1 &"
 
 # Wait for window
-wait_for_window "LibreOffice Writer" 60 || echo "WARNING: Writer window not found"
+ensure_writer_loaded || true
 
 # Maximize window
 WID=$(get_writer_window_id)

@@ -86,3 +86,6 @@ fi
 take_screenshot /tmp/task_initial.png
 
 echo "=== Setup Complete ==="
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true

@@ -126,7 +126,7 @@ echo "Launching LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/screenplay_draft.docx > /tmp/writer.log 2>&1 &"
 
 # Wait for Writer to start
-wait_for_window "LibreOffice Writer" 60 || echo "WARNING: Window wait timeout"
+ensure_writer_loaded || true
 
 # Maximize the window for the agent
 WID=$(get_writer_window_id)

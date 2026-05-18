@@ -112,7 +112,7 @@ echo "Launching LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/udhr_ocr_scan.docx > /tmp/writer.log 2>&1 &"
 
 # 5. Wait for window
-wait_for_window "LibreOffice Writer" 60 || wait_for_window "udhr_ocr_scan" 30
+ensure_writer_loaded || true
 
 # 6. Maximize and focus
 wid=$(get_writer_window_id)

@@ -82,7 +82,7 @@ echo "Starting LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/attendee_export_raw.docx > /tmp/writer.log 2>&1 &"
 
 # Wait for window to appear using shared utility
-wait_for_window "LibreOffice Writer" 45 || wait_for_window "attendee_export_raw" 20
+ensure_writer_loaded || true
 
 # Maximize window
 DISPLAY=:1 wmctrl -r "LibreOffice Writer" -b add,maximized_vert,maximized_horz 2>/dev/null || true

@@ -80,12 +80,18 @@ PYEOF
 # Set permissions
 chown ga:ga /home/ga/Documents/omnibase_manual.docx
 
+# Kill any lingering soffice (post_start, prior runs) so GUI launch isn't blocked
+pkill -9 -f soffice 2>/dev/null || true
+rm -f /home/ga/Documents/.~lock.* /tmp/.~lock.* 2>/dev/null || true
+rm -rf /home/ga/.config/libreoffice/4/user/backup/ 2>/dev/null || true
+sleep 3
+
 # Start LibreOffice Writer
 echo "Starting LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/omnibase_manual.docx > /dev/null 2>&1 &"
 
 # Wait for window
-wait_for_window "LibreOffice Writer" 60 || wait_for_window "omnibase_manual" 30
+ensure_writer_loaded || true
 
 # Maximize
 wid=$(get_writer_window_id)
@@ -101,5 +107,10 @@ fi
 echo "Capturing initial state..."
 sleep 2
 DISPLAY=:1 scrot /tmp/task_initial.png 2>/dev/null || true
+
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true
 
 echo "=== Setup complete ==="

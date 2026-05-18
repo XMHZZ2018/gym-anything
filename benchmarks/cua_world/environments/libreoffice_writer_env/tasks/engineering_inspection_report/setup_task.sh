@@ -313,3 +313,7 @@ echo "=== Engineering Inspection Report Task Setup Complete ==="
 echo "Source: /home/ga/Documents/inspection_draft.docx"
 echo "Required output: /home/ga/Documents/inspection_report.docx"
 exit 0
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true

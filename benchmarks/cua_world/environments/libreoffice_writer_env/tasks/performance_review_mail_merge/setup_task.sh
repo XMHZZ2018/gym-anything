@@ -138,6 +138,11 @@ sleep 1
 # Take initial screenshot
 DISPLAY=:1 scrot /tmp/task_initial.png 2>/dev/null || true
 
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true
+
 echo "=== Performance Review Mail Merge setup complete ==="
 echo "Template: /home/ga/Documents/review_letter_template.odt"
 echo "CSV Data: /home/ga/Documents/employee_data.csv"

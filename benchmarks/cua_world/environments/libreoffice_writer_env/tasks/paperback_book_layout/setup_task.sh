@@ -110,6 +110,11 @@ safe_xdotool ga :1 key Escape 2>/dev/null || true
 # Take initial screenshot
 take_screenshot /tmp/task_initial.png
 
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true
+
 echo "=== Task Setup Complete ==="
 echo "Instructions:"
 echo "1. Change page size to 6x9 inches"

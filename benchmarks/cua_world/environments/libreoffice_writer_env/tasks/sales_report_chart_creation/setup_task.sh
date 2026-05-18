@@ -61,12 +61,18 @@ mv /home/ga/Documents/temp_source.odt /home/ga/Documents/sales_report.odt
 rm /home/ga/Documents/temp_source.docx
 chown ga:ga /home/ga/Documents/sales_report.odt
 
+# Kill any lingering soffice (headless conversion above, post_start) so GUI launch isn't blocked
+pkill -9 -f soffice 2>/dev/null || true
+rm -f /home/ga/Documents/.~lock.* /tmp/.~lock.* 2>/dev/null || true
+rm -rf /home/ga/.config/libreoffice/4/user/backup/ 2>/dev/null || true
+sleep 3
+
 # 3. Launch LibreOffice Writer
 echo "Launching LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/sales_report.odt > /tmp/writer.log 2>&1 &"
 
 # 4. Wait for window and setup UI
-wait_for_window "sales_report" 60
+ensure_writer_loaded || true
 sleep 2
 
 # Maximize window
@@ -85,5 +91,10 @@ fi
 
 # 5. Take initial screenshot
 take_screenshot /tmp/task_initial.png
+
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true
 
 echo "=== Setup complete ==="

@@ -74,12 +74,18 @@ mv /home/ga/Documents/temp_draft.odt /home/ga/Documents/calculus_midterm_draft.o
 rm /tmp/temp_draft.docx
 chown ga:ga /home/ga/Documents/calculus_midterm_draft.odt
 
+# Kill any lingering soffice (headless conversion above, post_start) so GUI launch isn't blocked
+pkill -9 -f soffice 2>/dev/null || true
+rm -f /home/ga/Documents/.~lock.* /tmp/.~lock.* 2>/dev/null || true
+rm -rf /home/ga/.config/libreoffice/4/user/backup/ 2>/dev/null || true
+sleep 3
+
 # Launch LibreOffice Writer with the draft
 echo "Launching LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/calculus_midterm_draft.odt > /tmp/writer.log 2>&1 &"
 
 # Wait for window
-wait_for_window "LibreOffice Writer" 60 || wait_for_window "calculus_midterm" 30
+ensure_writer_loaded || true
 
 # Maximize and focus
 wid=$(get_writer_window_id)
@@ -96,3 +102,6 @@ fi
 take_screenshot /tmp/task_initial.png
 
 echo "=== Setup Complete ==="
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true

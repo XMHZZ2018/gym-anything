@@ -203,4 +203,9 @@ fi
 echo "Capturing initial state..."
 DISPLAY=:1 scrot /tmp/task_initial.png 2>/dev/null || true
 
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true
+
 echo "=== Task setup complete ==="

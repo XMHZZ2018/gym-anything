@@ -121,7 +121,7 @@ su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/emplo
 
 # Wait for process and window
 wait_for_process "soffice" 20
-wait_for_window "employee_roster_sensitive" 60 || wait_for_window "LibreOffice Writer" 60
+ensure_writer_loaded || true
 
 # Maximize and focus
 wid=$(get_writer_window_id)
@@ -138,3 +138,6 @@ fi
 take_screenshot /tmp/task_initial.png
 
 echo "=== Setup Complete ==="
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true

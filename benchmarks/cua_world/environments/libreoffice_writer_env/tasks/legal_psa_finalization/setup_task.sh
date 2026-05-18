@@ -336,3 +336,7 @@ echo "=== Legal PSA Finalization Task Setup Complete ==="
 echo "Source document: /home/ga/Documents/psa_draft.docx"
 echo "Required output: /home/ga/Documents/psa_final.docx"
 exit 0
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true

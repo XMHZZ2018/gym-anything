@@ -131,7 +131,7 @@ if ! pgrep -f "soffice.bin" > /dev/null; then
 fi
 
 # Wait for window
-wait_for_window "lab_report_draft" 30
+ensure_writer_loaded || true
 
 # Maximize window
 DISPLAY=:1 wmctrl -r "lab_report_draft" -b add,maximized_vert,maximized_horz 2>/dev/null || true

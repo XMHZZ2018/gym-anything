@@ -114,7 +114,7 @@ echo "Launching LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/SLA_Draft_Sentinels.odt > /tmp/writer_launch.log 2>&1 &"
 
 # Wait for Writer to appear
-wait_for_window "LibreOffice Writer" 60 || wait_for_window "SLA_Draft" 30
+ensure_writer_loaded || true
 
 # Maximize window
 WID=$(get_writer_window_id)

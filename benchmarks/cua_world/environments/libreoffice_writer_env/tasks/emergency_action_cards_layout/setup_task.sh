@@ -49,7 +49,7 @@ echo "Starting LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore > /dev/null 2>&1 &"
 
 # Wait for window
-wait_for_window "LibreOffice Writer" 30 || echo "Warning: Writer window not detected yet"
+ensure_writer_loaded || true
 
 # Maximize and focus
 wid=$(get_writer_window_id)
@@ -60,5 +60,10 @@ fi
 
 # Take initial screenshot
 DISPLAY=:1 scrot /tmp/task_initial.png 2>/dev/null || true
+
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true
 
 echo "=== Setup complete ==="

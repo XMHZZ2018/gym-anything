@@ -85,11 +85,15 @@ PYEOF
 # Set ownership
 chown ga:ga /home/ga/Documents/resume_draft.docx
 
+# Kill any lingering soffice (post_start, prior runs) so GUI launch isn't blocked
+pkill -9 -f soffice 2>/dev/null || true
+rm -f /home/ga/Documents/.~lock.* /tmp/.~lock.* 2>/dev/null || true
+rm -rf /home/ga/.config/libreoffice/4/user/backup/ 2>/dev/null || true
+sleep 3
+
 # Start LibreOffice Writer
 echo "Starting LibreOffice Writer..."
-if ! pgrep -f "soffice.bin" > /dev/null; then
-    su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/resume_draft.docx > /tmp/writer.log 2>&1 &"
-fi
+su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/resume_draft.docx > /tmp/writer.log 2>&1 &"
 
 # Wait for window
 if wait_for_window "LibreOffice Writer" 60; then
@@ -109,5 +113,10 @@ fi
 
 # Initial screenshot
 take_screenshot /tmp/task_initial.png
+
+
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true
 
 echo "=== Setup complete ==="

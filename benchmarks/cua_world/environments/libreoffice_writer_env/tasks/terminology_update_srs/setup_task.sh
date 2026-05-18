@@ -126,7 +126,7 @@ echo "Launching LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/DataSync_SRS_v2.3.docx > /tmp/writer.log 2>&1 &"
 
 # 4. Wait for window and maximize
-wait_for_window "DataSync_SRS_v2.3" 30 || wait_for_window "LibreOffice Writer" 30
+ensure_writer_loaded || true
 
 WID=$(get_writer_window_id)
 if [ -n "$WID" ]; then

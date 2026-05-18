@@ -163,3 +163,6 @@ take_screenshot /tmp/task_initial.png
 echo "=== Setup Complete ==="
 echo "Task: Insert 3 images and captions into soil_survey_draft.docx"
 echo "Images located in: /home/ga/Documents/images/"
+# --- Settle: ensure Writer is fully loaded, dialogs dismissed, and maximized ---
+source /workspace/scripts/task_utils.sh 2>/dev/null || true
+ensure_writer_loaded || true

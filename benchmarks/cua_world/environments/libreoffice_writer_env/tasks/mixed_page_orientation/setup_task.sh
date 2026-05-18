@@ -126,7 +126,7 @@ echo "Launching LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/bcp_draft.docx > /tmp/writer.log 2>&1 &"
 
 # Wait for Writer window
-wait_for_window "LibreOffice Writer" 60 || wait_for_window "bcp_draft" 30
+ensure_writer_loaded || true
 
 # Maximize window
 WID=$(get_writer_window_id)

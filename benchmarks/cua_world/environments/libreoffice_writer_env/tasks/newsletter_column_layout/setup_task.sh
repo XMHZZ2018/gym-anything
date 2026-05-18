@@ -77,7 +77,7 @@ echo "Launching LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer /home/ga/Documents/diabetes_newsletter_draft.docx > /dev/null 2>&1 &"
 
 # 5. Wait for window
-wait_for_window "LibreOffice Writer" 30 || wait_for_window "diabetes_newsletter" 30
+ensure_writer_loaded || true
 
 # 6. Maximize and focus (Critical for VLM/Agent)
 # We use a slight delay to ensure the window manager has registered the window

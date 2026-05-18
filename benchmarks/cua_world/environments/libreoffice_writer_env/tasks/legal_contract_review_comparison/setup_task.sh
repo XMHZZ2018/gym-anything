@@ -92,7 +92,7 @@ echo "Starting LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/contract_v1_original.odt > /dev/null 2>&1 &"
 
 # Wait for window
-wait_for_window "contract_v1" 60 || wait_for_window "Writer" 60
+ensure_writer_loaded || true
 
 # Maximize
 wid=$(get_writer_window_id)

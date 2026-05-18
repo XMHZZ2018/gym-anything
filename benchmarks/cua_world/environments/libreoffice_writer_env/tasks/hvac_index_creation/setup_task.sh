@@ -133,7 +133,7 @@ if ! wait_for_process "soffice" 15; then
 fi
 
 # Wait for window
-wait_for_window "hvac_service_manual" 60
+ensure_writer_loaded || true
 
 # Maximize window
 wid=$(get_writer_window_id)

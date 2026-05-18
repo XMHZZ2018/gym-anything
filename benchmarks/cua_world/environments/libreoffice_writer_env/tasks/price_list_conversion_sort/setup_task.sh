@@ -65,7 +65,7 @@ echo "Launching LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/raw_inventory_dump.docx > /tmp/writer.log 2>&1 &"
 
 # Wait for Writer to open
-wait_for_window "raw_inventory_dump" 60
+ensure_writer_loaded || true
 
 # Maximize the window
 wid=$(get_writer_window_id)

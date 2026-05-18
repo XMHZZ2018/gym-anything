@@ -104,7 +104,7 @@ echo "Launching LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer --norestore /home/ga/Documents/bio101_final_raw.docx > /tmp/writer_launch.log 2>&1 &"
 
 # Wait for Writer to appear
-wait_for_window "LibreOffice Writer" 60 || wait_for_window "bio101" 30
+ensure_writer_loaded || true
 
 # Maximize the window
 DISPLAY=:1 wmctrl -r "LibreOffice Writer" -b add,maximized_vert,maximized_horz 2>/dev/null || true

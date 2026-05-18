@@ -103,8 +103,8 @@ echo "Starting LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer \"/home/ga/Documents/thesis_draft.docx\" > /tmp/writer.log 2>&1 &"
 
 # Wait for window using task_utils.sh function
-wait_for_window "LibreOffice Writer" 60
-wait_for_window "thesis_draft" 20
+ensure_writer_loaded || true
+ensure_writer_loaded || true
 
 # Get Window ID
 WID=$(get_writer_window_id)

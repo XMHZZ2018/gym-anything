@@ -111,7 +111,7 @@ echo "Starting LibreOffice Writer..."
 su - ga -c "DISPLAY=:1 libreoffice --writer /home/ga/Documents/legacy_install_guide.docx &"
 
 # Wait for window
-wait_for_window "LibreOffice Writer" 60 || wait_for_window "legacy_install_guide" 60
+ensure_writer_loaded || true
 
 # Maximize window
 WID=$(get_writer_window_id)
