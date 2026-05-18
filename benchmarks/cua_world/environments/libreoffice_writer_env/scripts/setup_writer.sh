@@ -105,6 +105,25 @@ if id "ga" &>/dev/null; then
     setup_user_writer "ga" "/home/ga"
 fi
 
+# Pre-initialize LibreOffice profile to avoid first-launch
+# DeploymentException in syncRepositories that crashes soffice when a task
+# does headless conversion + GUI launch in quick succession.
+# Running --headless --terminate_after_init forces the extension repository
+# sync to happen now (once, with no document context) instead of crashing
+# the first GUI launch.
+if id "ga" &>/dev/null; then
+    echo "Pre-initializing LibreOffice profile for ga..."
+    sudo -u ga timeout 60 libreoffice --headless --terminate_after_init \
+        > /tmp/lo_profile_init.log 2>&1 || true
+    # Wait for any background soffice to exit cleanly
+    for i in 1 2 3 4 5; do
+        pgrep -u ga -f soffice > /dev/null || break
+        sleep 1
+    done
+    pkill -u ga -9 -f soffice 2>/dev/null || true
+    echo "  - LibreOffice profile initialized"
+fi
+
 # Create utility scripts for verifiers
 cat > /usr/local/bin/writer-headless << 'HEADLESSEOF'
 #!/bin/bash

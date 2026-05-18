@@ -114,6 +114,112 @@ safe_xdotool() {
     return ${PIPESTATUS[0]}
 }
 
+# Maximize a window by ID
+# Args: $1 - window ID (e.g. 0x...)
+maximize_window_id() {
+    local wid="$1"
+    [ -z "$wid" ] && return 1
+    DISPLAY=:1 wmctrl -ia "$wid" 2>/dev/null || true
+    DISPLAY=:1 wmctrl -ir "$wid" -b add,maximized_vert,maximized_horz 2>/dev/null || true
+}
+
+# Kill all LibreOffice processes
+kill_libreoffice() {
+    pkill -f "soffice" 2>/dev/null || true
+    sleep 1
+    pkill -9 -f "soffice" 2>/dev/null || true
+    sleep 1
+}
+
+# Dismiss LibreOffice startup dialogs (Recovery, Template, What's New, Tip)
+dismiss_dialogs() {
+    for attempt in 1 2 3; do
+        if DISPLAY=:1 wmctrl -l 2>/dev/null | grep -qi "Recovery\|Template\|What\|Tip of the Day"; then
+            echo "Dismissing dialog (attempt $attempt)..."
+            su - ga -c "DISPLAY=:1 xdotool key Escape" 2>/dev/null || true
+            sleep 2
+        else
+            break
+        fi
+    done
+    su - ga -c "DISPLAY=:1 xdotool key Escape" 2>/dev/null || true
+    sleep 1
+}
+
+# Ensure LibreOffice Writer is fully loaded, focused, and maximized.
+# Robust against:
+#   - splash/empty Writer window appearing before doc finishes loading
+#   - Document Recovery / Tip-of-the-Day dialogs
+#   - Writer self-resizing shortly after window first appears
+# Idempotent: safe to call at the end of any setup_task.sh that has
+# already launched soffice.
+ensure_writer_loaded() {
+    echo "ensure_writer_loaded: waiting for soffice process..."
+    wait_for_process "soffice" 30 || true
+
+    echo "ensure_writer_loaded: waiting for Writer/document window..."
+    # Match either the generic Writer window title or any open doc file.
+    local start=$(date +%s)
+    local timeout=90
+    while true; do
+        local elapsed=$(( $(date +%s) - start ))
+        if [ "$elapsed" -ge "$timeout" ]; then
+            echo "ensure_writer_loaded: timeout waiting for Writer window"
+            break
+        fi
+        if DISPLAY=:1 wmctrl -l 2>/dev/null | grep -qiE "LibreOffice Writer|\.docx|\.odt|\.doc "; then
+            echo "ensure_writer_loaded: Writer window detected after ${elapsed}s"
+            break
+        fi
+        sleep 1
+    done
+
+    # Initial settle delay so the doc has time to render before we touch it
+    sleep 4
+
+    # Dismiss any stray startup dialogs
+    dismiss_dialogs
+
+    # Find the Writer window ID (prefer doc-file title over splash)
+    local wid
+    wid=$(DISPLAY=:1 wmctrl -l 2>/dev/null | grep -iE "\.docx|\.odt|\.doc " | head -1 | awk '{print $1}')
+    if [ -z "$wid" ]; then
+        wid=$(DISPLAY=:1 wmctrl -l 2>/dev/null | grep -i "LibreOffice Writer" | head -1 | awk '{print $1}')
+    fi
+
+    if [ -z "$wid" ]; then
+        echo "ensure_writer_loaded: no Writer window found, giving up"
+        return 1
+    fi
+
+    # Re-apply maximize a few times — Writer sometimes resizes itself
+    # after first appearing.
+    local i
+    for i in 1 2 3; do
+        maximize_window_id "$wid"
+        sleep 1
+    done
+
+    # Final Escape in case a popup re-appeared during activation
+    su - ga -c "DISPLAY=:1 xdotool key Escape" 2>/dev/null || true
+    # Extra settle so the screenshot taken right after this returns
+    # captures the fully-rendered document.
+    sleep 3
+    return 0
+}
+
+# Take a screenshot of the current desktop. Tolerates missing scrot or X
+# unavailability so callers under `set -e` are not killed.
+# Args: $1 - output path
+take_screenshot() {
+    local out="$1"
+    [ -z "$out" ] && return 0
+    su - ga -c "DISPLAY=:1 scrot '$out'" 2>/dev/null \
+        || DISPLAY=:1 scrot "$out" 2>/dev/null \
+        || true
+    return 0
+}
+
 # Export these functions for use in other scripts
 export -f wait_for_window
 export -f wait_for_file
@@ -121,3 +227,8 @@ export -f wait_for_process
 export -f focus_window
 export -f get_writer_window_id
 export -f safe_xdotool
+export -f maximize_window_id
+export -f kill_libreoffice
+export -f dismiss_dialogs
+export -f ensure_writer_loaded
+export -f take_screenshot
