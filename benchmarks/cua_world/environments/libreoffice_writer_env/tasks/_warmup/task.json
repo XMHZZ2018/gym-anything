@@ -1,0 +1,21 @@
+{
+  "id": "_warmup@1",
+  "version": "1.0",
+  "env_id": "libreoffice_writer_env@0.1",
+  "description": "Warmup: focus and maximize a bare LibreOffice Writer window. No fixture, no verification. Used by the v3 UI-explorer planner.",
+  "difficulty": "easy",
+  "init": {
+    "timeout_sec": 120,
+    "max_steps": 1,
+    "reward_type": "sparse"
+  },
+  "hooks": {
+    "pre_task": "/workspace/tasks/_warmup/setup_task.sh"
+  },
+  "success": {
+    "mode": "program",
+    "spec": {
+      "program": "verifier.py::verify_warmup"
+    }
+  }
+}
